@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sympy as sp
 
+# Symbol
 x = sp.symbols('x')
 
 st.set_page_config(page_title="Convergence Visualizer", layout="centered")
@@ -11,11 +12,11 @@ st.title("📊 Algorithm Convergence Visualizer")
 
 # ---------------- EQUATIONS ----------------
 equations = {
-    "x³ - x - 2": "x**3 - x - 2",
-    "x² - 4": "x**2 - 4",
-    "cos(x) - x": "sp.cos(x) - x",
-    "x³ - 2x - 5": "x**3 - 2*x - 5",
-    "e^(-x) - x": "sp.exp(-x) - x",
+    "x^3 - x - 2": "x**3 - x - 2",
+    "x^2 - 4": "x**2 - 4",
+    "cos(x) - x": "cos(x) - x",
+    "x^3 - 2x - 5": "x**3 - 2*x - 5",
+    "e^(-x) - x": "exp(-x) - x",
 }
 
 choice = st.selectbox("Choose Equation", list(equations.keys()) + ["Custom"])
@@ -40,13 +41,13 @@ def bisection(f, a, b, tol=1e-5):
 
 def newton(f, df, x0, tol=1e-5):
     errors = []
-    x = x0
+    x_val = x0
     while True:
-        x_new = x - f(x)/df(x)
-        errors.append(abs(x_new - x))
-        if abs(x_new - x) < tol:
+        x_new = x_val - f(x_val)/df(x_val)
+        errors.append(abs(x_new - x_val))
+        if abs(x_new - x_val) < tol:
             break
-        x = x_new
+        x_val = x_new
     return errors
 
 def secant(f, x0, x1, tol=1e-5):
@@ -86,8 +87,12 @@ def fixed_point(g, x0, tol=1e-5):
 
 if expr:
     try:
+        # FIX: convert ^ to **
+        expr = expr.replace("^", "**")
+
         f_expr = sp.sympify(expr)
         f = sp.lambdify(x, f_expr, "numpy")
+
         df_expr = sp.diff(f_expr, x)
         df = sp.lambdify(x, df_expr, "numpy")
 
@@ -99,10 +104,11 @@ if expr:
             n = newton(f, df, 1.5)
             s = secant(f, 1, 2)
             r = regula_falsi(f, 1, 2)
+
             g = lambda x: x - f(x)
             fp = fixed_point(g, 1.5)
 
-            # Plot graph
+            # Plot
             fig, ax = plt.subplots()
 
             ax.plot(b, label="Bisection")
@@ -119,8 +125,8 @@ if expr:
 
             st.pyplot(fig)
 
-            # Extra info
-            st.subheader("📈 Iteration Counts")
+            # Iteration count
+            st.subheader("📈 Iteration Count Comparison")
             st.write({
                 "Bisection": len(b),
                 "Newton": len(n),
@@ -131,5 +137,5 @@ if expr:
 
             st.success("✅ Visualization Generated Successfully!")
 
-    except:
+    except Exception as e:
         st.error("❌ Invalid equation. Please check syntax.")
