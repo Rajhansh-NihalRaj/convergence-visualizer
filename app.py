@@ -87,18 +87,23 @@ def fixed_point(g, x0, tol=1e-5):
 
 if expr:
     try:
-        # FIX INPUT
+        # CLEAN INPUT
+        expr = expr.strip()
         expr = expr.replace("^", "**")
 
-        # SAFE FUNCTIONS
-        locals_dict = {
+        # SAFE FUNCTION MAP
+        allowed_functions = {
             "cos": sp.cos,
-            "exp": sp.exp
+            "sin": sp.sin,
+            "exp": sp.exp,
+            "log": sp.log
         }
 
-        f_expr = sp.sympify(expr, locals=locals_dict)
-        f = sp.lambdify(x, f_expr, "numpy")
+        # PARSE
+        f_expr = sp.sympify(expr, locals=allowed_functions)
 
+        # NUMERIC FUNCTIONS
+        f = sp.lambdify(x, f_expr, "numpy")
         df_expr = sp.diff(f_expr, x)
         df = sp.lambdify(x, df_expr, "numpy")
 
