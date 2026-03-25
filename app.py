@@ -12,10 +12,10 @@ st.title("📊 Algorithm Convergence Visualizer")
 
 # ---------------- EQUATIONS ----------------
 equations = {
-    "x^3 - x - 2": "x**3 - x - 2",
-    "x^2 - 4": "x**2 - 4",
+    "x^3 - x - 2": "x^3 - x - 2",
+    "x^2 - 4": "x^2 - 4",
     "cos(x) - x": "cos(x) - x",
-    "x^3 - 2x - 5": "x**3 - 2*x - 5",
+    "x^3 - 2x - 5": "x^3 - 2*x - 5",
     "e^(-x) - x": "exp(-x) - x",
 }
 
@@ -87,10 +87,16 @@ def fixed_point(g, x0, tol=1e-5):
 
 if expr:
     try:
-        # FIX: convert ^ to **
+        # FIX INPUT
         expr = expr.replace("^", "**")
 
-        f_expr = sp.sympify(expr)
+        # SAFE FUNCTIONS
+        locals_dict = {
+            "cos": sp.cos,
+            "exp": sp.exp
+        }
+
+        f_expr = sp.sympify(expr, locals=locals_dict)
         f = sp.lambdify(x, f_expr, "numpy")
 
         df_expr = sp.diff(f_expr, x)
@@ -105,7 +111,7 @@ if expr:
             s = secant(f, 1, 2)
             r = regula_falsi(f, 1, 2)
 
-            g = lambda x: x - f(x)
+            g = lambda val: val - f(val)
             fp = fixed_point(g, 1.5)
 
             # Plot
